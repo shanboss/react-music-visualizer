@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "target": "ESNext", // modern JS output
+    "module": "ESNext", // used by tsup to bundle
+    "jsx": "react-jsx", // JSX transform for React 17+
+    "declaration": true, // generate .d.ts files
+    "declarationDir": "dist", // put types in dist folder
+    "outDir": "dist", // where to put compiled files
+    "esModuleInterop": true, // fix for default imports (like react)
+    "skipLibCheck": true, // faster builds, skip type checks on deps
+    "moduleResolution": "node", // Node-style resolution
+    "resolveJsonModule": true, // allow importing JSON files
+    "isolatedModules": true, // needed by tools like tsup
+    "strict": true, // enable all strict type-checking
+    "emitDeclarationOnly": false
+  },
+  "include": ["src"],
+  "exclude": ["dist", "node_modules"]
+}
