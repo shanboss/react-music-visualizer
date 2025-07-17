@@ -14,9 +14,9 @@ A customizable React component for creating dynamic, real-time music visualizati
 ## 📦 Installation
 
 ```bash
-npm install react-music-visualizer
+npm install @manushanboss/react-music-visualizer
 # or
-yarn add react-music-visualizer
+yarn add @manushanboss/react-music-visualizer
 ```
 
 ## 🧠 Usage
