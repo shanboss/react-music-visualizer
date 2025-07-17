@@ -1,10 +1,14 @@
 {
-  "name": "react-music-visualizer",
-  "version": "1.0.0",
+  "name": "@manushanboss/react-music-visualizer",
+  "version": "0.1.1",
   "description": "A React music visualizer component library",
   "main": "dist/index.cjs",
   "module": "dist/index.js",
   "types": "dist/index.d.ts",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/shanboss/react-music-visualizer.git"
+  },
   "files": [
     "dist"
   ],
@@ -17,9 +21,18 @@
     "visualizer",
     "music",
     "component",
-    "library"
+    "library",
+    "audio",
+    "visualization",
+    "web",
+    "ui",
+    "interactive",
+    "animation",
+    "responsive",
+    "tailwindcss",
+    "lucide-react"
   ],
-  "author": "Your Name",
+  "author": "Manu Shanbhog",
   "license": "ISC",
   "peerDependencies": {
     "react": "^17.0.0 || ^18.0.0 || ^19.0.0",
@@ -31,7 +44,8 @@
     "postcss": "^8.5.6",
     "tailwindcss": "^4.1.11",
     "tsup": "^8.5.0",
-    "typescript": "^5.8.3"
+    "typescript": "^5.8.3",
+    "lucide-react": "0.525.0"
   },
   "dependencies": {
     "@tailwindcss/postcss": "^4.1.11"

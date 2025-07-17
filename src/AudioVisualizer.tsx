@@ -6,6 +6,7 @@ import React, {
   RefObject,
   ChangeEvent,
 } from "react";
+import { Play, Pause } from "lucide-react";
 
 type AudioVisualizer = {
   showPlayer?: boolean;
@@ -18,6 +19,10 @@ type AudioVisualizer = {
   fftSize?: number;
   startFreq?: number;
   endFreq?: number;
+  graphStyle?: "bottom" | "centered";
+  barStyle?: "rounded" | "square";
+  gapWidth?: number;
+  playerPosition?: "top" | "bottom";
 };
 
 export default function AudioVisualizer({
@@ -27,10 +32,14 @@ export default function AudioVisualizer({
   color = "#4E80EE",
   song,
   fftSize = 4096,
-  numBars = 80,
+  numBars = 30,
   startFreq = 20,
   endFreq = 20000,
   sampleRate = 44100,
+  graphStyle = "bottom",
+  barStyle = "rounded",
+  gapWidth = 1,
+  playerPosition = "bottom",
 }: AudioVisualizer) {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -109,7 +118,7 @@ export default function AudioVisualizer({
 
     const audioCtx = new window.AudioContext();
     const analyser = audioCtx.createAnalyser();
-    analyser.smoothingTimeConstant = 0.15;
+    analyser.smoothingTimeConstant = 0.01;
     analyser.fftSize = 8192;
 
     const source = audioCtx.createMediaElementSource(audioRef.current);
@@ -142,17 +151,28 @@ export default function AudioVisualizer({
     const animate = () => {
       analyserRef.current!.getByteFrequencyData(dataArrayRef.current!);
       logIndices.forEach((bin, i) => {
-        const val = dataArrayRef.current![bin] || 0;
-        const pct = Math.max(1, (val / 255) * 100);
+        const raw = dataArrayRef.current![bin] || 0; // 0‒255
+        const linear = raw / 255; // 0‒1
+
+        const pct = Math.max(1, linear * 100);
         const bar = barRefs.current[i];
-        if (bar) bar.style.height = pct + "%";
+        if (bar) {
+          if (graphStyle === "centered") {
+            bar.style.transform = `scaleY(${pct / 100})`;
+            bar.style.transformOrigin = "center";
+          } else {
+            bar.style.height = pct + "%";
+            bar.style.transform = "";
+            bar.style.transformOrigin = "";
+          }
+        }
       });
       animationId = requestAnimationFrame(animate);
     };
     animate();
 
     return () => cancelAnimationFrame(animationId);
-  }, []);
+  }, [graphStyle]);
 
   return (
     <div className="p-4 text-white w-full">
@@ -165,39 +185,56 @@ export default function AudioVisualizer({
           if (a && a.duration) setProgress((a.currentTime / a.duration) * 100);
         }}
         onLoadedMetadata={() => setProgress(0)}
+        onEnded={() => {
+          setIsPlaying(false);
+          setProgress(0);
+          if (audioRef.current) {
+            audioRef.current.currentTime = 0;
+          }
+        }}
       />
-      {/* Player Controls */}
-      <button onClick={togglePlay}>{isPlaying ? "Pause" : "Play"}</button>
 
-      {/* Scrubber */}
-      {showScrubber && (
-        <div
-          className="mt-2 flex items-center gap-2 w-full rounded-lg p-2"  
-          style={{ background: color }}
-        >
-          <span className="text-xs w-12 text-right">
-            {formatTime(audioRef.current?.currentTime || 0)}
-          </span>
-          <input
-            type="range"
-            min="0"
-            max="100"
-            step="0.1"
-            value={progress}
-            onChange={handleSeek}
-            className="flex-1 cursor-pointer"
-            style={{ accentColor: color }}
-          />
-          <span className="text-xs w-12">
-            {formatTime(audioRef.current?.duration || 0)}
-          </span>
-        </div>
+      {playerPosition === "top" && (
+        <>
+          {showScrubber && (
+            <div
+              className="mt-2 flex items-center gap-2 w-full rounded-lg p-2"
+              style={{ background: color }}
+            >
+              {showPlayer && (
+                <button onClick={togglePlay} className="mr-2">
+                  {isPlaying ? <Pause size={16} /> : <Play size={16} />}
+                </button>
+              )}
+              <span className="text-xs w-12 text-right">
+                {formatTime(audioRef.current?.currentTime || 0)}
+              </span>
+              <input
+                type="range"
+                min="0"
+                max="100"
+                step="0.1"
+                value={progress}
+                onChange={handleSeek}
+                className="flex-1 cursor-pointer"
+                style={{ accentColor: color }}
+              />
+              <span className="text-xs w-12">
+                {formatTime(audioRef.current?.duration || 0)}
+              </span>
+            </div>
+          )}
+        </>
       )}
 
-      {/* Bars */}
       <div
-        className="flex items-end gap-px mt-4 w-full overflow-hidden"
-        style={{ height: typeof height === "number" ? `${height}px` : height }}
+        className={`flex ${
+          graphStyle === "centered" ? "items-center" : "items-end"
+        } mt-4 w-full overflow-hidden`}
+        style={{
+          height: typeof height === "number" ? `${height}px` : height,
+          gap: `${gapWidth}px`, // ← NEW
+        }}
       >
         {logIndices.map((bin, i) => {
           const freqLabel = getFrequencyForBin(bin);
@@ -213,17 +250,58 @@ export default function AudioVisualizer({
               ref={(el) => {
                 barRefs.current[i] = el!;
               }}
-              className="flex flex-col items-center flex-1 basis-0 duration-150 rounded-full"
-              style={{ height: "1%" }}
+              className="flex flex-col items-center flex-1 basis-0"
+              style={{
+                height: graphStyle === "centered" ? "100%" : "1%",
+                transform: graphStyle === "centered" ? "scaleY(1)" : undefined,
+                transformOrigin:
+                  graphStyle === "centered" ? "center" : undefined,
+                transition: "height 150ms ease, transform 150ms ease",
+              }}
             >
               <div
-                className="w-full h-full rounded-full"
+                className={`w-full h-full ${
+                  barStyle === "rounded" ? "rounded-full" : ""
+                }`}
                 style={{ background: color }}
               />
             </div>
           );
         })}
       </div>
+
+      {playerPosition === "bottom" && (
+        <>
+          {showScrubber && (
+            <div
+              className="mt-2 flex items-center gap-2 w-full rounded-lg p-2"
+              style={{ background: color }}
+            >
+              {showPlayer && (
+                <button onClick={togglePlay} className="mr-2">
+                  {isPlaying ? <Pause size={16} /> : <Play size={16} />}
+                </button>
+              )}
+              <span className="text-xs w-12 text-right">
+                {formatTime(audioRef.current?.currentTime || 0)}
+              </span>
+              <input
+                type="range"
+                min="0"
+                max="100"
+                step="0.1"
+                value={progress}
+                onChange={handleSeek}
+                className="flex-1 cursor-pointer"
+                style={{ accentColor: color }}
+              />
+              <span className="text-xs w-12">
+                {formatTime(audioRef.current?.duration || 0)}
+              </span>
+            </div>
+          )}
+        </>
+      )}
     </div>
   );
 }
