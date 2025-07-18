@@ -1,6 +1,6 @@
 {
   "name": "@manushanboss/react-music-visualizer",
-  "version": "0.1.1",
+  "version": "0.2.1",
   "description": "A React music visualizer component library",
   "main": "dist/index.cjs",
   "module": "dist/index.js",

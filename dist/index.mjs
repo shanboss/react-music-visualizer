@@ -112,6 +112,7 @@ function AudioVisualizer({
   showScrubber = true,
   height = 60,
   color = "#4E80EE",
+  colorGradient,
   song,
   fftSize = 4096,
   numBars = 30,
@@ -226,6 +227,7 @@ function AudioVisualizer({
     animate();
     return () => cancelAnimationFrame(animationId);
   }, [graphStyle]);
+  const gradientId = "audio-vis-gradient-fixed";
   return /* @__PURE__ */ jsxs("div", { className: "p-4 text-white w-full", children: [
     /* @__PURE__ */ jsx(
       "audio",
@@ -272,6 +274,17 @@ function AudioVisualizer({
         ]
       }
     ) }),
+    colorGradient && /* @__PURE__ */ jsx(
+      "svg",
+      {
+        style: { height: 0, width: 0, position: "absolute" },
+        "aria-hidden": "true",
+        children: /* @__PURE__ */ jsx("defs", { children: /* @__PURE__ */ jsxs("linearGradient", { id: gradientId, x1: "0%", y1: "100%", x2: "0%", y2: "0%", children: [
+          /* @__PURE__ */ jsx("stop", { offset: "0%", stopColor: colorGradient[0] }),
+          /* @__PURE__ */ jsx("stop", { offset: "100%", stopColor: colorGradient[1] })
+        ] }) })
+      }
+    ),
     /* @__PURE__ */ jsx(
       "div",
       {
@@ -305,7 +318,12 @@ function AudioVisualizer({
                 "div",
                 {
                   className: `w-full h-full ${barStyle === "rounded" ? "rounded-full" : ""}`,
-                  style: { background: color }
+                  style: {
+                    background: colorGradient ? `url(#${gradientId})` : color,
+                    backgroundImage: colorGradient ? `linear-gradient(to top, ${colorGradient[0]}, ${colorGradient[1]})` : void 0,
+                    backgroundRepeat: "no-repeat",
+                    backgroundSize: "100% 100%"
+                  }
                 }
               )
             },
