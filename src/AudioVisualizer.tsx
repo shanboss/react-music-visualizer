@@ -12,6 +12,7 @@ type AudioVisualizer = {
   showPlayer?: boolean;
   showScrubber?: boolean;
   color?: string;
+  colorGradient?: [string, string];
   height?: number;
   song: string;
   numBars?: number;
@@ -30,6 +31,7 @@ export default function AudioVisualizer({
   showScrubber = true,
   height = 60,
   color = "#4E80EE",
+  colorGradient,
   song,
   fftSize = 4096,
   numBars = 30,
@@ -174,6 +176,8 @@ export default function AudioVisualizer({
     return () => cancelAnimationFrame(animationId);
   }, [graphStyle]);
 
+  const gradientId = "audio-vis-gradient-fixed";
+
   return (
     <div className="p-4 text-white w-full">
       <audio
@@ -227,6 +231,20 @@ export default function AudioVisualizer({
         </>
       )}
 
+      {colorGradient && (
+        <svg
+          style={{ height: 0, width: 0, position: "absolute" }}
+          aria-hidden="true"
+        >
+          <defs>
+            <linearGradient id={gradientId} x1="0%" y1="100%" x2="0%" y2="0%">
+              <stop offset="0%" stopColor={colorGradient[0]} />
+              <stop offset="100%" stopColor={colorGradient[1]} />
+            </linearGradient>
+          </defs>
+        </svg>
+      )}
+
       <div
         className={`flex ${
           graphStyle === "centered" ? "items-center" : "items-end"
@@ -263,7 +281,14 @@ export default function AudioVisualizer({
                 className={`w-full h-full ${
                   barStyle === "rounded" ? "rounded-full" : ""
                 }`}
-                style={{ background: color }}
+                style={{
+                  background: colorGradient ? `url(#${gradientId})` : color,
+                  backgroundImage: colorGradient
+                    ? `linear-gradient(to top, ${colorGradient[0]}, ${colorGradient[1]})`
+                    : undefined,
+                  backgroundRepeat: "no-repeat",
+                  backgroundSize: "100% 100%",
+                }}
               />
             </div>
           );
