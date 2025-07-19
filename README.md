@@ -2,6 +2,10 @@
 
 A customizable React component for creating dynamic, real-time music visualizations using an audio file.
 
+![Example 1](public/example1.gif)  
+![Example 2](public/example2.gif)  
+![Example 3](public/example1.gif)
+
 ## 🚀 Features
 
 - Pass an audio file via a `song` prop
