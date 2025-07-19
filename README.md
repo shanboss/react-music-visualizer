@@ -4,7 +4,7 @@ A customizable React component for creating dynamic, real-time music visualizati
 
 ![Example 1](public/example1.gif)  
 ![Example 2](public/example2.gif)  
-![Example 3](public/example1.gif)
+![Example 3](public/example3.gif)
 
 ## 🚀 Features
 
