@@ -2,9 +2,9 @@
 
 A customizable React component for creating dynamic, real-time music visualizations using an audio file.
 
-![Example 1](public/example1.gif)  
-![Example 2](public/example2.gif)  
-![Example 3](public/example3.gif)
+![Example 1](https://raw.githubusercontent.com/shanboss/react-music-visualizer/main/public/example1.gif)
+![Example 2](https://raw.githubusercontent.com/shanboss/react-music-visualizer/main/public/example2.gif)
+![Example 3](https://raw.githubusercontent.com/shanboss/react-music-visualizer/main/public/example3.gif)
 
 ## 🚀 Features
 
